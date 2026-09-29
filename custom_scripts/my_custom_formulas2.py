@@ -136,6 +136,20 @@ def run_custom_math(df, summary_row):
             summary_row["Cond_at_First_Synth_1"] = f"failed here bc of {str(e)}"
 
         # =========================================================
+        # 3B. EXTRACT MAXIMUM REACHED RMC
+        # =========================================================
+        try:
+            rmc_est_col = next((c for c in ["Estimated_RMC", "RMC_Est", "Mac.RMC_Estimate", "RMC_Est_at_RMC_27"] if c in df.columns), None)
+            if rmc_est_col:
+                rmc_vals = pd.to_numeric(df[rmc_est_col], errors='coerce')
+                max_rmc = rmc_vals.max()
+                summary_row["Max_Reached_RMC_Est"] = round(float(max_rmc), 2) if pd.notna(max_rmc) else "Invalid data"
+            else:
+                summary_row["Max_Reached_RMC_Est"] = "Column not found"
+        except Exception as e:
+            summary_row["Max_Reached_RMC_Est"] = f"failed here bc of {str(e)}"
+
+        # =========================================================
         # 4. EXTRACT MAXIMUM VALUE OF TIME ELAPSED
         # =========================================================
         try:
