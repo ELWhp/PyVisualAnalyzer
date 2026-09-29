@@ -13,6 +13,51 @@ def calc_mixing_ratio(temp_c, rh):
     return mr
 
 
+def fetch_tuning_value(col_name, val, sum_row):
+    """Safely extracts numeric values from sum_row for Tuning Book entries."""
+    exact_candidates = [f"Tun.{col_name}", f"Tun.{val}", col_name, val]
+    for cand in exact_candidates:
+        if cand and cand in sum_row:
+            v = sum_row[cand]
+            if pd.notna(v) and str(v).strip() != "":
+                try:
+                    return float(v)
+                except (ValueError, TypeError):
+                    pass
+
+    col_clean = col_name.lower().replace("_", " ")
+    val_clean = str(val).lower().replace("_", " ") if val else ""
+
+    alias_map = {
+        "bone dry weight": [["bone", "dry"]],
+        "start weight": [["start", "weight"], ["starting", "weight"]],
+        "end weight": [["end", "weight"], ["ending", "weight"]],
+        "start rmc": [["start", "rmc"]],
+        "end rmc": [["end", "rmc"]],
+    }
+
+    keyword_sets = alias_map.get(col_clean, [[kw for kw in col_clean.split() if kw]])
+    if val_clean and val_clean not in ["0", "0.0", "none", "nan"]:
+        keyword_sets.append([kw for kw in val_clean.split() if kw])
+
+    tun_keys = [k for k in sum_row.keys() if str(k).startswith("Tun.")]
+
+    for kw_set in keyword_sets:
+        if not kw_set:
+            continue
+        for k in tun_keys:
+            k_lower = str(k).lower()
+            if all(kw in k_lower for kw in kw_set):
+                v = sum_row[k]
+                if pd.notna(v) and str(v).strip() != "":
+                    try:
+                        return float(v)
+                    except (ValueError, TypeError):
+                        pass
+
+    return 0.0
+
+
 def get_single_value(col_name, mapping, df, sum_row):
     """Extracts value and converts to KG if it is a weight."""
     src = mapping.get(f"{col_name}_src", "Tuning Book")
@@ -28,10 +73,7 @@ def get_single_value(col_name, mapping, df, sum_row):
         raw_val = df[scale_col].iloc[-1] if scale_col and scale_col in df.columns and not df.empty else 0
         unit = "kg"
     elif src == "Tuning Book":
-        try:
-            raw_val = float(sum_row.get(f"Tun.{col_name}", sum_row.get(f"Tun.{val}", 0)))
-        except:
-            raw_val = 0
+        raw_val = fetch_tuning_value(col_name, val, sum_row)
     else:
         try:
             raw_val = float(val)
