@@ -1,0 +1,21 @@
+{
+    "custom_slots": [],
+    "master_template": {
+        "Bone Dry Weight_src": "Manual",
+        "Start Weight_src": "Use First Scale Weight",
+        "End Weight_src": "Use Last Scale Weight",
+        "Adjust_Weight_Opt": "2. Use Vaisalas & Start/End Weight",
+        "Mac Cycle": "Mac.Cycle",
+        "Scale Weight": "Daq.Weight AVG",
+        "Calc_Weight_Opt": "2. Filter Scale Data",
+        "Inlet Vaisala Temp": "Daq.337 Temp 1 (C)",
+        "Inlet Vaisala Humidity": "Daq.337 Humidity 1 (%)",
+        "Exhaust Vaisala Temp": "Daq.337 Temp 2 (C)",
+        "Exhaust Vaisala Humidity": "Daq.337 Humidity 2 (%)",
+        "Inlet Vaisala MR": "Calculate from Temp/RH",
+        "Exhaust Vaisala MR": "Calculate from Temp/RH",
+        "Power Phase 1": "Daq.310 P1 W (W)",
+        "Power Phase 2": "Daq.310 P2 W (W)"
+    },
+    "alpha_filter": "0.95"
+}
